@@ -1,151 +1,132 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue';
-import NumberButton from '../number-button/number-button.vue';
+import EqualButton from '../buttons/equal-button.vue';
+import NumberButton from '../buttons/number-button.vue';
 
-// example [+, /]
-//const selectedOperators = ref([]);
-//example [4,7,10]
-// const selectedNumber = ref([]);
+const currentValue = ref('');
+const previousValue = ref('');
+const operator = ref('');
 
-// example [+, /]
-const selectedOperators = ref([]);
+const numberArray: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+const operatorsArray: string[] = ['+', '-', '/', '*'];
 
-// example '84+4'
-const currentOperation = ref('');
-
-const numberArray = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-const operatorsArray = ['+', '-', '/', '*'];
-
-const addSelectedValue = (button) => {
-	currentOperation.value = currentOperation.value + String(button.value);
-	if (button.type > 0) {
-		selectedOperators.value.push(button.value);
-	}
+const selectedOperator = (oper: string): void => {
+    if (previousValue.value === '') {
+        previousValue.value = currentValue.value;
+        currentValue.value = '';
+        operator.value = oper;
+    } else {
+        solveOperation(false);
+        currentValue.value = '';
+        operator.value = oper;
+    }
+};
+const addNumber = (number: number): void => {
+    currentValue.value += number;
 };
 
-const solveOperation = () => {
-	let splittedNumbers = currentOperation.value.split(/[-+*\/]/);
-	console.log(splittedNumbers);
-	console.log(selectedOperators.value);
-	let result = Number(splittedNumbers[0]);
+const solveOperation = (isEqual = true): void => {
+    const solve = previousValue.value + operator.value + currentValue.value;
+    const result = eval(solve);
 
-	for (let i = 1; i < splittedNumbers.length; i++) {
-		const oper = selectedOperators.value[i - 1];
-
-		switch (oper) {
-			case '+': {
-				result = result + Number(splittedNumbers[i]);
-				break;
-			}
-			case '-': {
-				result = result - Number(splittedNumbers[i]);
-				break;
-			}
-			case '*': {
-				result = result * Number(splittedNumbers[i]);
-				break;
-			}
-			case '/': {
-				result = result / Number(splittedNumbers[i]);
-				break;
-			}
-			default:
-				break;
-		}
-		console.log('current Result ' + result);
-	}
-	console.log('final ', result);
+    previousValue.value = result;
+    if (isEqual) {
+        currentValue.value = '';
+    }
+    console.log(result);
 };
 </script>
 
 <template>
-	<h1>Calculator</h1>
-	<div class="display">
-		{{ currentOperation }}
-	</div>
-	<div class="calculator-container">
-		<div class="numbers-container">
-			<NumberButton
-				class="number-btn"
-				v-for="num in numberArray"
-				:btn-value="num"
-				:type="0"
-				@button-selected="addSelectedValue"
-			></NumberButton>
-		</div>
-		<div class="ope-container">
-			<div class="operators-container">
-				<NumberButton
-					class="number-btn"
-					v-for="operator in operatorsArray"
-					:btn-value="operator"
-					:type="1"
-					@button-selected="addSelectedValue"
-				></NumberButton>
-			</div>
-			<div>
-				<button class="equal-btn" @click="solveOperation">=</button>
-			</div>
-		</div>
-	</div>
+    <h1>Calculator</h1>
+    <div class="display">
+        <!-- <div>
+            {{ currentValue }}
+        </div> -->
+        <div>
+            {{ previousValue }}
+        </div>
+    </div>
+    <div class="calculator-container">
+        <div class="numbers-container">
+            <NumberButton
+                v-for="num in numberArray"
+                :btn-value="num"
+                @click="addNumber(num)"
+            ></NumberButton>
+        </div>
+        <div class="operators-container">
+            <div>
+                <button class="remove-btn">CE</button>
+            </div>
+            <div class="operators-buttons">
+                <NumberButton
+                    v-for="operator in operatorsArray"
+                    :btn-value="operator"
+                    @click="selectedOperator(operator)"
+                ></NumberButton>
+            </div>
+            <div>
+                <EqualButton @click="solveOperation"></EqualButton>
+            </div>
+        </div>
+    </div>
 </template>
 
 <style scoped>
 .display {
-	background-color: #b8b7b7e6;
-	border-radius: 10px 10px 0 0;
-	max-width: 30%;
-	padding: 5px;
-	min-height: 40px;
-	font-weight: 600;
-	font-size: 16px;
-	letter-spacing: 2px;
-	margin: auto;
+    background-color: #b8b7b7e6;
+    border-radius: 10px 10px 0 0;
+    max-width: 30%;
+    padding: 5px;
+    min-height: 40px;
+    font-weight: 600;
+    font-size: 17px;
+    letter-spacing: 2px;
+    margin: auto;
+    text-align: end;
+    display: flex;
+    justify-content: end;
+    align-items: end;
 }
 .calculator-container {
-	padding: 15px 5px 5px 5px;
-	margin: auto;
-	border-radius: 0 0 10px 10px;
-	max-width: 30%;
-	display: flex;
-	justify-content: space-between;
-	gap: 10px;
-	background-color: #f2f2f2e6;
+    padding: 15px 5px 5px 5px;
+    margin: auto;
+    border-radius: 0 0 10px 10px;
+    max-width: 30%;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    background-color: #f2f2f2e6;
 }
 .numbers-container {
-	width: 70%;
-	display: grid;
-	grid-template-columns: repeat(3, 1fr);
-	gap: 5px;
+    width: 70%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
 }
-.number-btn {
-	width: 100%;
-	height: 50px;
-	border: none;
-	border-radius: 10px;
-	background-color: #a9a9a95e;
-	font-size: 18px;
-	font-weight: 500;
+.remove-btn {
+    width: 100%;
+    background-color: #ad69568a;
+    border: none;
+    border-radius: 10px;
+    height: 50px;
+    font-size: 17px;
+    font-weight: 500;
 }
-.number-btn:hover {
-	background-color: #a9a9a9b8;
-}
-.ope-container {
-	width: 30%;
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
+.remove-btn:hover {
+    background-color: #c751318a;
+    cursor: pointer;
 }
 .operators-container {
-	display: grid;
-	grid-template-columns: repeat(2, 1fr);
-	gap: 5px;
+    width: 30%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
-.equal-btn {
-	width: 100%;
-	background-color: #4a4a768a;
-	border: none;
-	border-radius: 10px;
-	height: 50px;
+.operators-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
 }
 </style>
