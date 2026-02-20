@@ -25,15 +25,21 @@ const addNumber = (number: number): void => {
     currentValue.value += number;
 };
 
+const removeNumber = (): void => {
+    console.log(currentValue.value.slice(0, -1));
+    currentValue.value = currentValue.value.slice(0, -1);
+};
+
 const solveOperation = (isEqual = true): void => {
     const solve = previousValue.value + operator.value + currentValue.value;
     const result = eval(solve);
 
-    previousValue.value = result;
     if (isEqual) {
-        currentValue.value = '';
+        currentValue.value = result;
+        previousValue.value = '';
+    } else {
+        previousValue.value = result;
     }
-    console.log(result);
 };
 </script>
 
@@ -44,7 +50,7 @@ const solveOperation = (isEqual = true): void => {
             {{ currentValue }}
         </div> -->
         <div>
-            {{ previousValue }}
+            {{ currentValue }}
         </div>
     </div>
     <div class="calculator-container">
@@ -57,7 +63,7 @@ const solveOperation = (isEqual = true): void => {
         </div>
         <div class="operators-container">
             <div>
-                <button class="remove-btn">CE</button>
+                <button class="remove-btn" @click="removeNumber">CE</button>
             </div>
             <div class="operators-buttons">
                 <NumberButton
@@ -71,6 +77,7 @@ const solveOperation = (isEqual = true): void => {
             </div>
         </div>
     </div>
+    <div>Result --> {{ previousValue }}</div>
 </template>
 
 <style scoped>
