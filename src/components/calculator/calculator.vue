@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import EqualButton from '../buttons/equal-button.vue';
 import NumberButton from '../buttons/number-button.vue';
+import Display from '../display/display.vue';
 
 const currentValue = ref('');
 const previousValue = ref('');
@@ -26,7 +27,6 @@ const addNumber = (number: number): void => {
 };
 
 const removeNumber = (): void => {
-    console.log(currentValue.value.slice(0, -1));
     currentValue.value = currentValue.value.slice(0, -1);
 };
 
@@ -35,24 +35,21 @@ const solveOperation = (isEqual = true): void => {
     const result = eval(solve);
 
     if (isEqual) {
-        currentValue.value = result;
+        currentValue.value = String(result);
         previousValue.value = '';
     } else {
-        previousValue.value = result;
+        previousValue.value = String(result);
     }
 };
 </script>
 
 <template>
     <h1>Calculator</h1>
-    <div class="display">
-        <!-- <div>
-            {{ currentValue }}
-        </div> -->
-        <div>
-            {{ currentValue }}
-        </div>
-    </div>
+    <Display
+        :current-value="currentValue"
+        :previous-value="previousValue"
+        :operator="operator"
+    ></Display>
     <div class="calculator-container">
         <div class="numbers-container">
             <NumberButton
@@ -77,25 +74,9 @@ const solveOperation = (isEqual = true): void => {
             </div>
         </div>
     </div>
-    <div>Result --> {{ previousValue }}</div>
 </template>
 
 <style scoped>
-.display {
-    background-color: #b8b7b7e6;
-    border-radius: 10px 10px 0 0;
-    max-width: 30%;
-    padding: 5px;
-    min-height: 40px;
-    font-weight: 600;
-    font-size: 17px;
-    letter-spacing: 2px;
-    margin: auto;
-    text-align: end;
-    display: flex;
-    justify-content: end;
-    align-items: end;
-}
 .calculator-container {
     padding: 15px 5px 5px 5px;
     margin: auto;
