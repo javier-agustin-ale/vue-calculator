@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, nextTick } from 'vue';
 import EqualButton from '../buttons/equal-button.vue';
 import NumberButton from '../buttons/number-button.vue';
 import Display from '../display/display.vue';
@@ -8,10 +8,13 @@ const currentValue = ref('');
 const previousValue = ref('');
 const operator = ref('');
 
-const numberArray: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+const triggerAnimation = ref(false);
+
+const numberArray: number[] = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
 const operatorsArray: string[] = ['+', '-', '/', '*'];
 
 const selectedOperator = (oper: string): void => {
+    if (!currentValue.value) return;
     if (previousValue.value === '') {
         previousValue.value = currentValue.value;
         currentValue.value = '';
@@ -21,6 +24,13 @@ const selectedOperator = (oper: string): void => {
         currentValue.value = '';
         operator.value = oper;
     }
+    triggerAnimation.value = false;
+    nextTick(() => {
+        triggerAnimation.value = true;
+        setTimeout(() => {
+            triggerAnimation.value = false;
+        }, 250);
+    });
 };
 const addNumber = (number: number): void => {
     currentValue.value += number;
@@ -31,8 +41,9 @@ const removeNumber = (): void => {
 };
 
 const solveOperation = (isEqual = true): void => {
+    if (!currentValue.value || !previousValue.value) return;
     const solve = previousValue.value + operator.value + currentValue.value;
-    const result = eval(solve);
+    const result = parseFloat(eval(solve).toFixed(4));
 
     if (isEqual) {
         currentValue.value = String(result);
@@ -44,17 +55,18 @@ const solveOperation = (isEqual = true): void => {
 </script>
 
 <template>
-    <h1>Calculator</h1>
     <Display
         :current-value="currentValue"
         :previous-value="previousValue"
         :operator="operator"
+        :trigger-animation="triggerAnimation"
     ></Display>
     <div class="calculator-container">
         <div class="numbers-container">
             <NumberButton
                 v-for="num in numberArray"
                 :btn-value="num"
+                :class="{ zero: num === 0 }"
                 @click="addNumber(num)"
             ></NumberButton>
         </div>
@@ -79,9 +91,7 @@ const solveOperation = (isEqual = true): void => {
 <style scoped>
 .calculator-container {
     padding: 15px 5px 5px 5px;
-    margin: auto;
     border-radius: 0 0 10px 10px;
-    max-width: 30%;
     display: flex;
     justify-content: space-between;
     gap: 10px;
@@ -92,6 +102,9 @@ const solveOperation = (isEqual = true): void => {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 5px;
+}
+.zero {
+    grid-column: 2;
 }
 .remove-btn {
     width: 100%;
