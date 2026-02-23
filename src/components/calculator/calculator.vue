@@ -10,7 +10,7 @@ const operator = ref('');
 
 const triggerAnimation = ref(false);
 
-const numberArray: number[] = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
+const valuesArray: (number | string)[] = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0, '.'];
 const operatorsArray: string[] = ['+', '-', '/', '*'];
 
 const selectedOperator = (oper: string): void => {
@@ -32,7 +32,8 @@ const selectedOperator = (oper: string): void => {
         }, 250);
     });
 };
-const addNumber = (number: number): void => {
+const addValue = (number: number | string): void => {
+    if (number === '.' && currentValue.value.includes('.')) return;
     currentValue.value += number;
 };
 
@@ -64,10 +65,10 @@ const solveOperation = (isEqual = true): void => {
     <div class="calculator-container">
         <div class="numbers-container">
             <NumberButton
-                v-for="num in numberArray"
-                :btn-value="num"
-                :class="{ zero: num === 0 }"
-                @click="addNumber(num)"
+                v-for="val in valuesArray"
+                :btn-value="val"
+                :class="{ zero: val === 0 }"
+                @click="addValue(val)"
             ></NumberButton>
         </div>
         <div class="operators-container">
