@@ -10,7 +10,7 @@ const operator = ref('');
 
 const triggerAnimation = ref(false);
 
-const valuesArray: (number | string)[] = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0, '.'];
+const valuesArray: (number | string)[] = [9, 8, 7, 6, 5, 4, 3, 2, 1, '.', 0];
 const operatorsArray: string[] = ['+', '-', '/', '*'];
 
 const selectedOperator = (oper: string): void => {
@@ -41,6 +41,11 @@ const removeNumber = (): void => {
     currentValue.value = currentValue.value.slice(0, -1);
 };
 
+const porcentage = (): void => {
+    if (!currentValue.value) return;
+    currentValue.value = String(parseFloat(currentValue.value) / 100);
+};
+
 const solveOperation = (isEqual = true): void => {
     if (!currentValue.value || !previousValue.value) return;
     const solve = previousValue.value + operator.value + currentValue.value;
@@ -67,9 +72,9 @@ const solveOperation = (isEqual = true): void => {
             <NumberButton
                 v-for="val in valuesArray"
                 :btn-value="val"
-                :class="{ zero: val === 0 }"
                 @click="addValue(val)"
             ></NumberButton>
+            <NumberButton :btn-value="'%'" @click="porcentage"></NumberButton>
         </div>
         <div class="operators-container">
             <div>
@@ -91,7 +96,7 @@ const solveOperation = (isEqual = true): void => {
 
 <style scoped>
 .calculator-container {
-    padding: 15px 5px 5px 5px;
+    padding: 15px 10px;
     border-radius: 0 0 10px 10px;
     display: flex;
     justify-content: space-between;
@@ -104,9 +109,7 @@ const solveOperation = (isEqual = true): void => {
     grid-template-columns: repeat(3, 1fr);
     gap: 5px;
 }
-.zero {
-    grid-column: 2;
-}
+
 .remove-btn {
     width: 100%;
     background-color: #ad69568a;

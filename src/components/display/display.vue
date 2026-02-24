@@ -16,7 +16,7 @@ const props = defineProps({
                 {{ operator && previousValue ? operator : '' }}
             </div>
             <div class="current-value">
-                {{ currentValue }}
+                {{ currentValue || '0' }}
             </div>
         </div>
     </div>
